@@ -1,3 +1,4 @@
+
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -80,4 +81,5 @@ def summarize_endpoint():
 if __name__ == '__main__':
     # This runs the app in debug mode locally.
     # We use gunicorn to run it in production on Render.
+
     app.run(debug=True, port=5000)
