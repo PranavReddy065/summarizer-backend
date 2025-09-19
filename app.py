@@ -9,7 +9,8 @@ from flask_cors import CORS
 # Get your Hugging Face API token from https://huggingface.co/settings/tokens
 # It's best practice to set this as an environment variable.
 HF_API_TOKEN = os.environ.get("HF_API_TOKEN")
-SUMMARIZATION_API_URL = "https://api-inference.huggingface.co/models/sshleifer/distilbart-cnn-12-6"
+
+SUMMARIZATION_API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large"
 
 # --- FLASK APP ---
 app = Flask(__name__)
@@ -36,16 +37,26 @@ def get_article_text(url):
         print(f"Error fetching URL: {e}")
         return None
 
-def summarize_text(text_to_summarize):
-    """Calls the Hugging Face API to summarize the text."""
-    if not HF_API_TOKEN:
-        return {"error": "Hugging Face API token is not set."}
-        
+def summarize_text_free(text_to_summarize):
     headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
+    
+    truncated_text = text_to_summarize[:1024*4] # Truncate text
+
+    # Create a clear instruction for the Flan-T5 model
+    task_prompt = f"Summarize the following text:\n\n{truncated_text}"
+    
     payload = {
-        "inputs": text_to_summarize,
-        "parameters": {"min_length": 30, "max_length": 150}
+        "inputs": task_prompt,
+        "parameters": {"min_length": 30, "max_length": 150} 
     }
+    
+    try:
+        response = requests.post(SUMMARIZATION_API_URL, headers=headers, json=payload, timeout=60)
+        summary = response.json()
+        return summary[0]['summary_text']
+    except Exception as e:
+        print(e)
+        return {"error": "Model is loading or an issue occurred. Please try again in a moment."}
     
     try:
         response = requests.post(SUMMARIZATION_API_URL, headers=headers, json=payload, timeout=30)
