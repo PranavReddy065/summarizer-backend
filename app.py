@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-# New imports for new features
+# Imports for new features
 from youtube_transcript_api import YouTubeTranscriptApi
 from urllib.parse import urlparse, parse_qs
 import fitz # PyMuPDF
