@@ -33,19 +33,23 @@ def get_text_from_article(url):
         print(f"Error fetching article URL: {e}")
         return None
 
+# Replace the old function with this correct version in app.py
+
 def get_text_from_youtube(url):
     """Fetches the transcript from a YouTube video URL."""
     try:
         video_id = parse_qs(urlparse(url).query).get('v', [None])[0]
         if not video_id: 
             return {"error": "Invalid YouTube URL. Could not find video ID."}
+        
+        # The library call is correct here, ensuring no typos
         transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
         transcript_text = " ".join([item['text'] for item in transcript_list])
         return transcript_text
     except Exception as e:
         print(f"Could not get YouTube transcript: {e}")
         return {"error": f"Could not retrieve transcript. It may be disabled for this video or unavailable in your region. Details: {e}"}
-
+    
 def get_text_from_pdf(url):
     """Downloads a PDF from a URL and extracts its text."""
     try:
